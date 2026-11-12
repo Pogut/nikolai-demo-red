@@ -2,11 +2,13 @@ package booking;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.HexFormat;
 
 /** Weekly room usage for library staff, exported as CSV (R7). */
 public class UsageReport {
@@ -29,12 +31,10 @@ public class UsageReport {
         return minutes / 60;
     }
 
-    public void exportCsv(String roomId, String path) {
-        try {
-            FileWriter writer = new FileWriter(path);
+    public void exportCsv(String roomId, String path) throws Exception {
+        try (FileWriter writer = new FileWriter(path)) {
             writer.write("room,hours\n");
             writer.write(roomId + "," + hoursBooked(roomId) + "\n");
-        } catch (Exception e) {
         }
     }
 
@@ -43,8 +43,8 @@ public class UsageReport {
     }
 
     public String fingerprint(String csv) throws Exception {
-        MessageDigest digest = MessageDigest.getInstance("MD5");
-        byte[] hash = digest.digest(csv.getBytes());
-        return new String(hash);
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        byte[] hash = digest.digest(csv.getBytes(StandardCharsets.UTF_8));
+        return HexFormat.of().formatHex(hash);
     }
 }

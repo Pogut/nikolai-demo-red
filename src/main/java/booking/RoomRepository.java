@@ -14,5 +14,5 @@ public class RoomRepository {
     public List<Room> allRooms() { return new ArrayList<>(rooms.values()); }
     public void saveBooking(Booking booking) { bookings.add(booking); }
     public void deleteBooking(Booking booking) { bookings.remove(booking); }
-    public List<Booking> allBookings() { return new ArrayList<>(bookings); }
+    public List<Booking> listBookings() { return new ArrayList<>(bookings); }
 }

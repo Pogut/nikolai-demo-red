@@ -8,21 +8,20 @@ import java.util.UUID;
 
 public class BookingService {
     private final RoomRepository repository;
+    private final List<BookingListener> listeners = new ArrayList<>();
 
     public BookingService(RoomRepository repository) {
         this.repository = repository;
     }
 
+    public void addListener(BookingListener listener) {
+        listeners.add(listener);
+    }
+
     public List<Room> freeRooms(LocalDateTime start, LocalDateTime end) {
         List<Room> free = new ArrayList<>();
         for (Room room : repository.allRooms()) {
-            boolean taken = false;
-            for (Booking booking : repository.allBookings()) {
-                if (booking.getRoomId().equals(room.getId()) && booking.overlaps(start, end)) {
-                    taken = true;
-                }
-            }
-            if (!taken && !room.isBlocked()) {
+            if (!isTaken(room.getId(), start, end) && !room.isBlocked()) {
                 free.add(room);
             }
         }
@@ -40,13 +39,14 @@ public class BookingService {
         if (Duration.between(start, end).toMinutes() > 120) {
             throw new IllegalArgumentException("A booking can last at most 2 hours");
         }
-        for (Booking booking : repository.allBookings()) {
-            if (booking.getRoomId().equals(roomId) && booking.overlaps(start, end)) {
-                throw new IllegalStateException("Room " + roomId + " is already booked");
-            }
+        if (isTaken(roomId, start, end)) {
+            throw new IllegalStateException("Room " + roomId + " is already booked");
         }
         Booking booking = new Booking(UUID.randomUUID().toString(), roomId, studentId, start, end);
         repository.saveBooking(booking);
+        for (BookingListener listener : listeners) {
+            listener.onBooked(booking);
+        }
         return booking;
     }
 
@@ -58,5 +58,17 @@ public class BookingService {
             throw new IllegalStateException("Too late to cancel");
         }
         repository.deleteBooking(booking);
+        for (BookingListener listener : listeners) {
+            listener.onCancelled(booking);
+        }
+    }
+
+    private boolean isTaken(String roomId, LocalDateTime start, LocalDateTime end) {
+        for (Booking booking : repository.listBookings()) {
+            if (booking.getRoomId().equals(roomId) && booking.overlaps(start, end)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

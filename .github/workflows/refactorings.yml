@@ -1,0 +1,23 @@
+name: Refactoring Report
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: read
+  pull-requests: write
+  pages: write
+  id-token: write
+  actions: read
+
+# Runs share one Pages site, so they must not overlap.
+concurrency:
+  group: refactoring-pages-publish
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Pogut/RefactoringMiner-action@v2.1.0

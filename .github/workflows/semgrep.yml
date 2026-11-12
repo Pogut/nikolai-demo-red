@@ -1,0 +1,33 @@
+name: Semgrep
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+# A newer push cancels the run on the older commit: NikolAI only reads the PR's head commit.
+concurrency:
+  group: semgrep-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:1.183.0
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The PR's head commit, not the merge commit Actions checks out by default, so the
+          # line numbers match the PR's Files changed.
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Scan
+        run: semgrep scan --config p/default --metrics=off --json --output semgrep.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: semgrep-results
+          path: semgrep.json
+          if-no-files-found: error
+          retention-days: 7

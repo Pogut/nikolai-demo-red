@@ -67,12 +67,4 @@ public class UsageReport {
         byte[] hash = digest.digest(csv.getBytes(StandardCharsets.UTF_8));
         return HexFormat.of().formatHex(hash);
     }
-
-    /** Counts one room's bookings. */
-    public int countForRoom(Connection connection, String roomId) throws Exception {
-        java.sql.Statement statement = connection.createStatement();
-        ResultSet rows = statement.executeQuery("SELECT COUNT(*) FROM bookings WHERE room_id = '" + roomId + "'");
-        rows.next();
-        return rows.getInt(1);
-    }
 }

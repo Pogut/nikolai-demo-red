@@ -39,8 +39,11 @@ public class UsageReport {
         }
     }
 
-    public void archive(String path) throws IOException {
-        new ProcessBuilder("gzip", "--", path).inheritIO().start();
+    public void archive(String path) throws IOException, InterruptedException {
+        Process gzip = new ProcessBuilder("gzip", "--", path).inheritIO().start();
+        if (gzip.waitFor() != 0) {
+            throw new IOException("gzip could not archive " + path);
+        }
     }
 
     /** Reads a required database setting from the environment. */

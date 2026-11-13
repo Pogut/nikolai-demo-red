@@ -24,21 +24,8 @@ func (n *Notifier) NotifyBooking(email, room, when string, cancelled bool) error
 
 // bookingMessage is the subject and body of a booking email.
 func bookingMessage(room, when string, cancelled bool) (string, string) {
-	return bookingSubject(cancelled), bookingBody(room, when, cancelled)
-}
-
-// bookingSubject is the subject line of a booking email.
-func bookingSubject(cancelled bool) string {
 	if cancelled {
-		return "Booking cancelled"
+		return "Booking cancelled", fmt.Sprintf("Your booking of %s on %s was cancelled.", room, when)
 	}
-	return "Booking confirmed"
-}
-
-// bookingBody is the text of a booking email.
-func bookingBody(room, when string, cancelled bool) string {
-	if cancelled {
-		return fmt.Sprintf("Your booking of %s on %s was cancelled.", room, when)
-	}
-	return fmt.Sprintf("Your booking of %s on %s is confirmed.", room, when)
+	return "Booking confirmed", fmt.Sprintf("Your booking of %s on %s is confirmed.", room, when)
 }

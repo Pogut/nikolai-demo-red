@@ -39,6 +39,13 @@ public class UsageReport {
         }
     }
 
+    /** Saves a room's report in the shared reports folder, named after the room id from the request. */
+    public String exportForRoom(String roomId) throws Exception {
+        String path = "/var/library/reports/" + roomId + ".csv";
+        exportCsv(roomId, path);
+        return path;
+    }
+
     public void archive(String path) throws IOException, InterruptedException {
         Process gzip = new ProcessBuilder("gzip", "--", path).inheritIO().start();
         if (gzip.waitFor() != 0) {

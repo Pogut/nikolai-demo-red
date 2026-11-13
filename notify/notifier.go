@@ -16,13 +16,16 @@ func NewNotifier(sender Sender) *Notifier {
 	return &Notifier{sender: sender}
 }
 
-// SendMsg tells a student their booking was confirmed or cancelled.
-func (n *Notifier) SendMsg(email, room, when string, cancelled bool) error {
-	subject := "Booking confirmed"
-	body := fmt.Sprintf("Your booking of %s on %s is confirmed.", room, when)
-	if cancelled {
-		subject = "Booking cancelled"
-		body = fmt.Sprintf("Your booking of %s on %s was cancelled.", room, when)
-	}
+// NotifyBooking tells a student their booking was confirmed or cancelled.
+func (n *Notifier) NotifyBooking(email, room, when string, cancelled bool) error {
+	subject, body := bookingMessage(room, when, cancelled)
 	return n.sender.Send(email, subject, body)
+}
+
+// bookingMessage is the subject and body of a booking email.
+func bookingMessage(room, when string, cancelled bool) (string, string) {
+	if cancelled {
+		return "Booking cancelled", fmt.Sprintf("Your booking of %s on %s was cancelled.", room, when)
+	}
+	return "Booking confirmed", fmt.Sprintf("Your booking of %s on %s is confirmed.", room, when)
 }

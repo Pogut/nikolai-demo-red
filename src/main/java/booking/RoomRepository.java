@@ -11,7 +11,7 @@ public class RoomRepository {
 
     public void addRoom(Room room) { rooms.put(room.getId(), room); }
     public Room findRoom(String id) { return rooms.get(id); }
-    public List<Room> allRooms() { return new ArrayList<>(rooms.values()); }
+    public List<Room> listRooms() { return new ArrayList<>(rooms.values()); }
     public void saveBooking(Booking booking) { bookings.add(booking); }
     public void deleteBooking(Booking booking) { bookings.remove(booking); }
     public List<Booking> listBookings() { return new ArrayList<>(bookings); }

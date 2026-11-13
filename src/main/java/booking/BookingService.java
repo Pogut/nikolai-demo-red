@@ -20,7 +20,7 @@ public class BookingService {
 
     public List<Room> freeRooms(LocalDateTime start, LocalDateTime end) {
         List<Room> free = new ArrayList<>();
-        for (Room room : repository.allRooms()) {
+        for (Room room : repository.listRooms()) {
             if (!isTaken(room.getId(), start, end) && !room.isBlocked()) {
                 free.add(room);
             }
